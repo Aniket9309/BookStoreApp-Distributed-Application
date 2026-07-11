@@ -2,11 +2,13 @@ pipeline {
     agent { label 'slave' }
 
     environment {
-        AWS_REGION    = 'ap-south-1'
-        ECR_REGISTRY  = '198452821908.dkr.ecr.ap-south-1.amazonaws.com'
-        SERVICE_NAME  = 'bookstore-eureka-discovery-service'
-        IMAGE_TAG     = "${env.BUILD_NUMBER}"
-    }
+    AWS_REGION    = 'ap-south-1'
+    ECR_REGISTRY  = '198452821908.dkr.ecr.ap-south-1.amazonaws.com'
+    SERVICE_NAME  = 'bookstore-eureka-discovery-service'
+    IMAGE_TAG     = "${env.BUILD_NUMBER}"
+    JAVA_HOME     = '/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64'
+    PATH          = "${JAVA_HOME}/bin:${env.PATH}"
+}
 
     stages {
         stage('Checkout') {
