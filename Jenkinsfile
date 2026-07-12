@@ -2,13 +2,11 @@ pipeline {
     agent { label 'slave' }
 
     environment {
-    AWS_REGION    = 'ap-south-1'
-    ECR_REGISTRY  = '198452821908.dkr.ecr.ap-south-1.amazonaws.com'
-    SERVICE_NAME  = 'bookstore-eureka-discovery-service'
-    IMAGE_TAG     = "${env.BUILD_NUMBER}"
-    JAVA_HOME     = '/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64'
-    PATH          = "${JAVA_HOME}/bin:${env.PATH}"
-}
+        AWS_REGION    = 'ap-south-1'
+        ECR_REGISTRY  = '198452821908.dkr.ecr.ap-south-1.amazonaws.com'
+        SERVICE_NAME  = 'bookstore-eureka-discovery-service'
+        IMAGE_TAG     = "${env.BUILD_NUMBER}"
+    }
 
     stages {
         stage('Checkout') {
@@ -17,20 +15,13 @@ pipeline {
             }
         }
 
-        stage('Build (Maven)') {
+        stage('Docker Build (Multi-stage)') {
             steps {
-                sh 'mvn clean install -DskipTests'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                dir("${SERVICE_NAME}") {
-                    sh """
-                        docker build --build-arg JAR_FILE=${SERVICE_NAME}-0.0.1-SNAPSHOT.jar \
-                        -t ${SERVICE_NAME}:${IMAGE_TAG} .
-                    """
-                }
+                sh """
+                    docker build --build-arg SERVICE=${SERVICE_NAME} \
+                    -f ${SERVICE_NAME}/Dockerfile \
+                    -t ${SERVICE_NAME}:${IMAGE_TAG} .
+                """
             }
         }
 
